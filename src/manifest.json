@@ -27,12 +27,7 @@
     "newtab": "index.html"
   },
   "background": {
-    "service_worker": "background.js",
-    "scripts": [
-      "js/hostPermissions.js",
-      "background.js",
-      "offscreen.js"
-    ]
+    "service_worker": "background.js"
   },
   "action": {
     "default_icon": {

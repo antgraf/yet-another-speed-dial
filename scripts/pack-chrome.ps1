@@ -1,5 +1,8 @@
 # Build the Chrome Web Store package into dist/yasd2-<version>-chrome.zip
 # Usage: pwsh -File scripts/pack-chrome.ps1
+#
+# Shared src/manifest.json already uses service_worker only. This script adds
+# the Chromium-only `offscreen` permission required for thumbnail DOM parsing.
 
 $ErrorActionPreference = 'Stop'
 
@@ -30,10 +33,18 @@ Copy-Item -Path (Join-Path $repoRoot 'src\*') -Destination $stageDir -Recurse -F
 
 $manifestPath = Join-Path $stageDir 'manifest.json'
 $manifest = Get-Content $manifestPath -Raw
-$manifest = $manifest -replace '("contextMenus",\r?\n\s*)', "`$1`"offscreen`",`n    "
-# Drop Firefox-only background.scripts (and the comma on the preceding service_worker line)
-$manifest = $manifest -replace '(?ms),\r?\n\s*"scripts":\s*\[[^\]]*\]', ''
+if ($manifest -notmatch '"offscreen"') {
+    $manifest = $manifest -replace '("contextMenus",\r?\n\s*)', "`$1`"offscreen`",`n    "
+}
 [System.IO.File]::WriteAllText($manifestPath, $manifest)
+
+$parsed = Get-Content $manifestPath -Raw | ConvertFrom-Json
+if ($parsed.background.scripts) {
+    throw 'Chrome package must not include background.scripts'
+}
+if ($parsed.permissions -notcontains 'offscreen') {
+    throw 'Chrome package missing offscreen permission'
+}
 
 if (Test-Path $zipPath) {
     Remove-Item $zipPath -Force

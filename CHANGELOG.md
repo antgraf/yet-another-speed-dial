@@ -16,4 +16,4 @@
 - Fix Firefox thumbnail capture: avoid `handleMessages` name clash on the shared event page; await processing so the page stays alive
 - Declare Firefox `data_collection_permissions` (`none`); `strict_min_version` 140 (desktop) / 142 (Android)
 - Move Chrome-only `offscreen` APIs into `js/chromeOffscreen.js` (omitted from the Firefox AMO package)
-- Firefox package strips `background.service_worker`; Chrome package drops Firefox `background.scripts`
+- Shared manifest is Chrome-first (`service_worker` only); Firefox pack injects `background.scripts`
