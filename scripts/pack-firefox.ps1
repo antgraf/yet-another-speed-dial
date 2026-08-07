@@ -1,5 +1,9 @@
 # Build the Firefox (AMO) package into dist/yasd2-<version>-firefox.zip
 # Usage: pwsh -File scripts/pack-firefox.ps1
+#
+# Shared src/manifest.json is Chrome-first (service_worker only). This script:
+# - replaces background.service_worker with background.scripts for Firefox
+# - omits Chrome-only js/chromeOffscreen.js
 
 $ErrorActionPreference = 'Stop'
 
@@ -35,8 +39,26 @@ if (Test-Path $chromeOffscreen) {
 
 $manifestPath = Join-Path $stageDir 'manifest.json'
 $manifest = Get-Content $manifestPath -Raw
-$manifest = $manifest -replace '(?m)^\s*"service_worker":\s*"background\.js",\r?\n', ''
+$firefoxBackground = @'
+  "background": {
+    "scripts": [
+      "js/hostPermissions.js",
+      "background.js",
+      "offscreen.js"
+    ]
+  },
+'@
+$manifest = $manifest -replace '(?ms)\s*"background":\s*\{[^}]*\},', "`n$firefoxBackground"
 [System.IO.File]::WriteAllText($manifestPath, $manifest)
+
+# Validate JSON and expected background.scripts
+$parsed = Get-Content $manifestPath -Raw | ConvertFrom-Json
+if ($parsed.background.service_worker) {
+    throw 'Firefox package still has background.service_worker'
+}
+if (-not $parsed.background.scripts) {
+    throw 'Firefox package missing background.scripts'
+}
 
 if (Test-Path $zipPath) {
     Remove-Item $zipPath -Force
