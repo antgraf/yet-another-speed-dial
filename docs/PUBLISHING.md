@@ -58,7 +58,22 @@ Privacy policy URL for store forms (GitHub Pages from `/docs`):
 3. Confirm `browser_specific_settings.gecko.id` is `yet-another-speed-dial-2@antgraf`
 4. Confirm `gecko.data_collection_permissions.required` is `["none"]` (AMO requires this for new listings; matches the privacy policy — no analytics/backend)
 5. Paste privacy policy URL + listing text
-6. After approval, put the AMO URL into README badges
+6. Paste **Notes to Reviewer** (below). Leave the optional source-code upload empty unless AMO asks — this package is readable source (no minify/bundle of first-party code).
+7. After approval, put the AMO URL into README badges
+
+### Notes to Reviewer (Firefox) — paste-ready
+
+AMO’s “Notes to Reviewer” field asks about build processes and [source code submission](https://extensionworkshop.com/documentation/publish/source-code-submission/). Separate source is only required when the uploaded package is hard to read (minifiers, webpack, etc.). For YASD2, the zip is `src/` with Chrome-only bits stripped.
+
+```
+No minification or bundling of first-party code. The uploaded package is the readable source under src/, packaged with scripts/pack-firefox.ps1 (copy src → strip Chrome-only offscreen/service_worker). Reviewers can treat the XPI contents as the source.
+
+Third-party libraries under js/lib/ are unmodified upstream vendor builds (jQuery, Sortable, TweenMax, Coloris, flexCarousel, browser-polyfill). AMO may flag innerHTML in those vendor files; that is expected and not used for remote code execution.
+
+This is an unofficial maintained fork of Yet Another Speed Dial (Conceptualspace). It stores dials as ordinary browser bookmarks, uses optional host permissions only for thumbnail fetch/capture when the user grants them, and collects no analytics (data_collection_permissions: none).
+
+Repo: https://github.com/antgraf/yet-another-speed-dial-2
+```
 
 ## Chrome Web Store
 
@@ -147,8 +162,33 @@ User data disclosure (typical for this extension): bookmarks and website content
 ## Microsoft Edge Add-ons
 
 1. https://partner.microsoft.com/dashboard/microsoftedge/overview
-2. New submission with the same zip and listing text
-3. Edge assigns its own extension ID
+2. New submission; upload `dist/yasd2-4.0.0-chrome.zip` (Chromium package) and the same listing text / privacy policy URL
+3. Paste **Notes for reviewer** (below)
+4. Edge assigns its own extension ID
+
+### Notes for reviewer (Edge) — paste-ready
+
+Edge asks for test accounts, steps to reach hidden/limited features, and product dependencies. YASD2 has no accounts or paid tiers; everything works locally after install.
+
+```
+Test accounts
+None. This extension has no user accounts, backends, social logins, or paid/locked tiers. Reviewers do not need usernames or passwords.
+
+How to test / access features
+1. Install the extension and open a new tab (it replaces the Edge new-tab page with the speed dial).
+2. Use the default sample dials, or add a dial via the “+” control on the new-tab page, the toolbar action, or the page context-menu item “Add to Speed Dial”.
+3. Edit, reorder (drag), delete dials, and create nested folders from the new-tab UI. Dials are stored as ordinary browser bookmarks under a Speed Dial bookmarks folder.
+4. Open Settings from the new-tab UI to change appearance (background, dial size, titles, etc.). Settings and thumbnail caches use local extension storage.
+5. Optional host access: when adding a dial or refreshing thumbnails, Edge may prompt for site access so the extension can fetch page images or capture a screenshot. Deny = dials still work without automatic thumbnails; Allow = thumbnails generate. There is no separate “unlock” or hidden mode.
+6. Nested folders: create a folder on the dial page, open it to see its contents; breadcrumb / folder navigation returns to parent levels.
+
+Dependencies on other products
+None. No dependency on other Microsoft Store products, cloud services, or third-party apps. Optional: if the user enables Edge bookmark sync, Speed Dial bookmarks sync like any other bookmarks — that is browser sync, not an extension backend.
+
+Notes
+Unofficial maintained fork of Yet Another Speed Dial (Conceptualspace). No analytics or YASD2 server. Privacy policy: https://antgraf.github.io/yet-another-speed-dial-2/privacy.html
+Repo: https://github.com/antgraf/yet-another-speed-dial-2
+```
 
 ## After all three are live
 
